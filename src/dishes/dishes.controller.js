@@ -71,6 +71,21 @@ function update(req, res) {
   res.json({ data: dish });
 }
 
+function idIsValid(req, res, next) {
+  const { dishId } = req.params;
+  const { data: { id } = {} } = req.body;
+  if (id) {
+    if (id === dishId) {
+      return next();
+    }
+    return next({
+      status: 400,
+      message: `Dish id does not match route id. Dish: ${id}, Route: ${dishId}`,
+    });
+  }
+  next();
+}
+
 function priceIsValid(req, res, next) {
   const { data: { price } = {} } = req.body;
   if (price <= 0 || typeof price !== 'number') {
@@ -99,6 +114,7 @@ module.exports = {
     bodyDataHas('description'),
     bodyDataHas('price'),
     bodyDataHas('image_url'),
+    idIsValid,
     priceIsValid,
     update,
   ],
